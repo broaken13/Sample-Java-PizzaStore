@@ -9,6 +9,8 @@ package com.bryson.pizzadelivery.models;
  *
  * @author bjo
  */
+
+// I am adding a comment here
 public class Coupon {
     private int id;
     private String couponCode;
