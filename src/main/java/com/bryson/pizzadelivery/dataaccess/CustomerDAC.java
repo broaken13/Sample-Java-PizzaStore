@@ -13,9 +13,9 @@ import java.sql.*;
  *
  * @author bjo
  */
-public class CustomerDAO {
+public class CustomerDAC {
 
-    public static ArrayList<Customer> getAllCustomers() {
+    public static ArrayList<Customer> getAllCustomers() throws SQLException {
         String query = "SELECT * FROM Customer";
         ArrayList<Customer> customers = new ArrayList<>();
 
@@ -29,53 +29,49 @@ public class CustomerDAO {
 
             statement.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw e;
         }
 
         return customers;
     }
 
-    public static Customer getSingleCustomer(String identifier) throws IllegalArgumentException, Exception {
+    public static Customer getSingleCustomer(String identifier) throws Exception {
         Customer cust = null;
         String query = generateQueryFromIdentifier(identifier);
-        
-        PreparedStatement statement = StatementProvider.getPreparedStatement(query);
 
-        try {
-            if(query.contains("email")) {
+        try (PreparedStatement statement = StatementProvider.getPreparedStatement(query)) {
+            if (query.contains("email")) {
                 statement.setString(1, identifier);
             } else {
                 int id = Integer.parseInt(identifier);
                 statement.setInt(1, id);
             }
-            
+
             ResultSet rs = statement.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 cust = createCustomerFromResultSet(rs);
             } else {
                 throw new IllegalArgumentException();
             }
-            
-        } catch (IllegalArgumentException e) {
-            throw e;
+
         } catch (Exception e) {
             throw e;
         }
 
         return cust;
     }
-    
+
     private static String generateQueryFromIdentifier(String identifier) {
         String query = "SELECT * FROM Customer WHERE holder = ?";
-        
+
         try {
             int id = Integer.parseInt(identifier);
             query = query.replaceAll("holder", "id");
         } catch (NumberFormatException e) {
             query = query.replaceAll("holder", "email");
         }
-        
+
         return query;
     }
 
@@ -89,5 +85,40 @@ public class CustomerDAO {
         cust.setPhone(rs.getString("phone"));
 
         return cust;
+    }
+
+    public static Customer insertCustomer(Customer customer) throws Exception {
+        String query = "INSERT INTO Customer (email, name, address, phone)"
+                + " VALUES (?,?,?,?)";
+
+ 
+
+        try (PreparedStatement statement = StatementProvider.getPreparedStatement(query)) {
+            statement.setString(1, customer.getEmail());
+            statement.setString(2, customer.getName());
+            statement.setString(3, customer.getAddress());
+            statement.setString(4, customer.getPhone());
+            statement.executeUpdate();
+            
+            return getSingleCustomer(customer.getEmail());
+
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public static boolean checkEmailIsUsed(String email) throws SQLException {
+        String query = "SELECT email FROM Customer WHERE email = ?";
+
+        try (PreparedStatement statement = StatementProvider.getPreparedStatement(query)) {
+
+            statement.setString(1, email);
+            ResultSet rs = statement.executeQuery();
+            return rs.next();
+
+        } catch (SQLException e) {
+            throw e;
+        }
+
     }
 }
