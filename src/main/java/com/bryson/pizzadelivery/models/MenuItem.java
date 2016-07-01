@@ -5,6 +5,8 @@
  */
 package com.bryson.pizzadelivery.models;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author bjo
@@ -13,6 +15,8 @@ public class MenuItem {
     private int id;
     private String itemName;
     private String description;
+    
+    private ArrayList<MenuItemSize> sizes;
 
     public int getId() {
         return id;
@@ -37,5 +41,14 @@ public class MenuItem {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public ArrayList<MenuItemSize> getSizes() {
+        return sizes;
+    }
+
+    public void setSizes(ArrayList<MenuItemSize> sizes) {
+        this.sizes = sizes;
+    }
+    
     
 }

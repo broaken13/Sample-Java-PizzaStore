@@ -56,8 +56,6 @@ public class MenuItemSize {
 
     public void setMenuItem(MenuItem menuItem) {
         this.menuItem = menuItem;
-    }
-    
-    
+    } 
     
 }
